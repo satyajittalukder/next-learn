@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 
 
 const SignIn = () => {
@@ -26,6 +25,7 @@ const SignIn = () => {
               <Input
                 id="email"
                 type="email"
+                required
                 placeholder="john@example.com"
                 className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
               />
@@ -38,6 +38,7 @@ const SignIn = () => {
               <Input
                 id="password"
                 type="password"
+                required
                 placeholder="Create a strong password"
                 className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
               />

@@ -25,6 +25,7 @@ const SignUp = () => {
               <Input
                 id="name"
                 type="text"
+                required
                 placeholder="John Doe"
                 className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
               />
@@ -37,6 +38,7 @@ const SignUp = () => {
               <Input
                 id="email"
                 type="email"
+                required
                 placeholder="john@example.com"
                 className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
               />
@@ -49,6 +51,7 @@ const SignUp = () => {
               <Input
                 id="password"
                 type="password"
+                required
                 placeholder="Create a strong password"
                 className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
               />
