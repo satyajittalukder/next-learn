@@ -18,8 +18,8 @@ const Navbar = () => {
             Log In
           </Link>
           <Link href="/sign-up">
-            <Button className="h-8 text-xs sm:text-sm px-3 sm:px-4">
-              <span className="hidden sm:inline">Get Started Free</span>
+            <Button className="h-8  text-xs sm:text-sm px-3 sm:px-4 py-4">
+              <div className="hidden sm:inline">Get Started Free</div>
               <span className="inline sm:hidden">Sign Up</span>
             </Button>
           </Link>
