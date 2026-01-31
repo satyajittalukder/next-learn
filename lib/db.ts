@@ -6,41 +6,45 @@ interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
 }
+
 declare global {
-  var mongooseCache: MongooseCache | undefined;
+  var mongoose: MongooseCache | undefined;
 }
 
-let cached: MongooseCache = global.mongooseCache || { conn: null, promise: null };
+let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
 
-if (!cached) {
-  cached = global.mongooseCache = { conn: null, promise: null };
+if (!global.mongoose) {
+  global.mongoose = cached;
 }
 
 async function connectDB() {
-
   if (!MONGO_URI) {
-    throw new Error("MONGO_URI is not defined in environment variables");
+    throw new Error(
+      "Please define the MONGODB_URI environment variable inside .env"
+    );
   }
 
   if (cached.conn) {
     return cached.conn;
   }
+
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
     };
+
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }
+
   try {
     cached.conn = await cached.promise;
-  } catch (err) {
+  } catch (e) {
     cached.promise = null;
-    throw err;
+    throw e;
   }
+
   return cached.conn;
 }
 
