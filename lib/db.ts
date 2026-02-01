@@ -20,7 +20,7 @@ if (!global.mongoose) {
 async function connectDB() {
   if (!MONGO_URI) {
     throw new Error(
-      "Please define the MONGODB_URI environment variable inside .env"
+      "Please define the MONGO_URI environment variable inside .env"
     );
   }
 
@@ -31,6 +31,10 @@ async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 10000, // Add this
+      socketTimeoutMS: 45000,           // Add this
+      maxPoolSize: 1,                   // Add this for serverless
+      minPoolSize: 0,                   // Add this for serverless
     };
 
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
