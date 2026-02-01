@@ -31,6 +31,7 @@ const SignUp = () => {
         setError(result.error.message ?? "Failed to sign up. Please try again.")
       } else {
         router.push("/dashboard");
+        router.refresh();
       }
     } catch (err) {
       setError("An error occurred during sign up. Please try again.")
