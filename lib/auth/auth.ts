@@ -22,6 +22,17 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          if (user.id) {
+            await initializeUserBoard(user.id);
+          }
+        }
+      }
+    }
+  }
   // databaseHooks: {
   //   user: {
   //     create: {
@@ -51,4 +62,8 @@ export async function signOut() {
   if (result.success) {
     redirect("/sign-in");
   }
+}
+
+function initializeUserBoard(id: string) {
+  throw new Error("Function not implemented.");
 }
