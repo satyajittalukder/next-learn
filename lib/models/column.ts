@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 
 export interface IColumn extends Document {
   name: string;
-  BoardId: string;
+  boardId: mongoose.Types.ObjectId;
   order: number;
-  jobApplicationIds: mongoose.Types.ObjectId[];
+  jobApplications: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,9 +13,9 @@ export interface IColumn extends Document {
 const ColumnSchema: Schema<IColumn> = new Schema(
   {
     name: { type: String, required: true },
-    BoardId: { type: String, ref: "Board", required: true, index: true },
+    boardId: { type: Schema.Types.ObjectId, ref: "Board", required: true, index: true },
     order: { type: Number, required: true, default: 0 },
-    jobApplicationIds: [{
+    jobApplications: [{
       type: Schema.Types.ObjectId,
       ref: "JobApplication",
       default: []

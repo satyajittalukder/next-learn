@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 // import { initializeUserBoard } from "../init-user-board";
 import connectDB from "../db";
+import { initUserBoard } from "../init-user-board";
 
 const mongooseInstance = await connectDB();
 const client = mongooseInstance.connection.getClient();
@@ -27,23 +28,12 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           if (user.id) {
-            await initializeUserBoard(user.id);
+            await initUserBoard(user.id);
           }
         }
       }
     }
   }
-  // databaseHooks: {
-  //   user: {
-  //     create: {
-  //       after: async (user) => {
-  //         if (user.id) {
-  //           await initializeUserBoard(user.id);
-  //         }
-  //       },
-  //     },
-  //   },
-  // },
 });
 
 export async function getSession() {
