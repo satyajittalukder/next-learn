@@ -5,31 +5,32 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ChangeEvent, useState } from "react"
-import { signUp } from "@/lib/auth/auth-client"
-import { redirect, useRouter } from "next/navigation"
-import { getSession } from "@/lib/auth/auth"
+import { ChangeEvent, useState, useEffect } from "react"
+import { signUp, useSession } from "@/lib/auth/auth-client"
+import { useRouter } from "next/navigation"
 
-const SignUp = async() => {
-   const session = await getSession();
-    if (session?.user) {
-      redirect('/dashboard');  // or '/api/auth/signin' for Better Auth
-    }
-
+const SignUp = () => {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   const router = useRouter();
+  const { data: session, isPending } = useSession();
 
-  const handleSubmit = async (e: ChangeEvent) => {
+  // Redirect in useEffect, not during render
+  useEffect(() => {
+    if (session?.user) {
+      router.push('/dashboard');
+    }
+  }, [session, router]);
+
+  const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError("")
     setLoading(true)
-    // Simulate an API call
+
     try {
       const result = await signUp.email({ name, email, password })
       if (result.error) {
@@ -43,15 +44,26 @@ const SignUp = async() => {
     } finally {
       setLoading(false)
     }
+  }
 
-    setTimeout(() => {
-      setLoading(false)
-      // Here you would normally handle the response from the server
-    }, 2000)
+  // Don't render form while checking session or if already logged in
+  if (isPending) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    return null; // Don't render anything during redirect
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-linear-to-br from-slate-50 via-blue-50 to-slate-100 p-4">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-4">
       <Card className="mx-auto w-full max-w-md border-0 shadow-2xl">
         <CardHeader className="space-y-2 pb-6 text-center">
           <CardTitle className="text-3xl font-bold tracking-tight">Create Account</CardTitle>

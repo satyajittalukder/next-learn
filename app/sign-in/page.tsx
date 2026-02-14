@@ -4,22 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { ChangeEvent, useState } from "react"
-import { redirect, useRouter } from "next/navigation"
-import { signIn } from "@/lib/auth/auth-client"
+import { ChangeEvent, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { signIn, useSession } from "@/lib/auth/auth-client"
 import { toast } from "sonner"
-import { getSession } from "@/lib/auth/auth"
 
-const SignIn = async () => {
-  const session = await getSession();
-  if (session?.user) {
-    redirect('/dashboard');  // or '/api/auth/signin' for Better Auth
-  }
+const SignIn = () => {
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
 
   const router = useRouter();
+  const { data: session, isPending } = useSession();
+
+  // Redirect in useEffect, not during render
+  useEffect(() => {
+    if (session?.user) {
+      router.push('/dashboard');
+    }
+  }, [session, router]);
+
 
   const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -39,6 +44,21 @@ const SignIn = async () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    return null; // Don't render anything during redirect
   }
 
   return (
