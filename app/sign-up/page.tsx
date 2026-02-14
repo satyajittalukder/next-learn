@@ -7,9 +7,14 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ChangeEvent, useState } from "react"
 import { signUp } from "@/lib/auth/auth-client"
-import { useRouter } from "next/dist/client/components/navigation"
+import { redirect, useRouter } from "next/navigation"
+import { getSession } from "@/lib/auth/auth"
 
-const SignUp = () => {
+const SignUp = async() => {
+   const session = await getSession();
+    if (session?.user) {
+      redirect('/dashboard');  // or '/api/auth/signin' for Better Auth
+    }
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")

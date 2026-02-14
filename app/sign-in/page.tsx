@@ -5,11 +5,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { ChangeEvent, useState } from "react"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { signIn } from "@/lib/auth/auth-client"
 import { toast } from "sonner"
+import { getSession } from "@/lib/auth/auth"
 
-const SignIn = () => {
+const SignIn = async () => {
+  const session = await getSession();
+  if (session?.user) {
+    redirect('/dashboard');  // or '/api/auth/signin' for Better Auth
+  }
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -19,7 +24,7 @@ const SignIn = () => {
   const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       const result = await signIn.email({ email, password })
       if (result.error) {
