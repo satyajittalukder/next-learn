@@ -35,7 +35,10 @@ const Dashboard = async () => {
   const boardDoc = await Board.findOne({
     userId: session?.user.id,
     name: "Job Hunt",
+  }).populate({
+    path: "columns",
   });
+
   const board = boardDoc ? JSON.parse(JSON.stringify(boardDoc)) : null;
   // const board = await getBoard(session?.user.id || "");
 
