@@ -53,7 +53,3 @@ export async function signOut() {
     redirect("/sign-in");
   }
 }
-
-function initializeUserBoard(id: string) {
-  throw new Error("Function not implemented.");
-}

@@ -1,87 +1,82 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-} from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createJobSchema, type CreateJobInput } from "@/lib/schemas/job";
+import { updateJobSchema, type UpdateJobInput } from "@/lib/schemas/job";
 import { toast } from "sonner";
 import { useState } from "react";
 
-interface CreateJobApplicationDialogueProps {
-  boardId: string;
-  columnId: string;
-  onSuccess?: (job: any) => void;
+interface EditJobDialogProps {
+  job: {
+    _id: string;
+    company: string;
+    position: string;
+    location?: string;
+    salary?: number;
+    jobUrl?: string;
+    notes?: string;
+    appliedDate?: string;
+  };
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
 }
 
-const CreateJobApplicationDialogue = ({
-  boardId,
-  columnId,
-  onSuccess,
-}: CreateJobApplicationDialogueProps) => {
-  const [open, setOpen] = useState(false);
+const EditJobDialog = ({ job, open, onOpenChange, onSuccess }: EditJobDialogProps) => {
   const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
-  } = useForm<CreateJobInput>({
-    resolver: zodResolver(createJobSchema),
+  } = useForm<UpdateJobInput>({
+    resolver: zodResolver(updateJobSchema),
     defaultValues: {
-      boardId,
-      columnId,
+      company: job.company,
+      position: job.position,
+      location: job.location || "",
+      salary: job.salary,
+      jobUrl: job.jobUrl || "",
+      notes: job.notes || "",
+      appliedDate: job.appliedDate ? new Date(job.appliedDate).toISOString().split("T")[0] : "",
     },
   });
 
-  const onSubmit = async (data: CreateJobInput) => {
+  const onSubmit = async (data: UpdateJobInput) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/jobs", {
-        method: "POST",
+      const response = await fetch(`/api/jobs/${job._id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create job");
+        throw new Error("Failed to update job");
       }
 
-      const createdJob = await response.json();
-      toast.success("Job application added successfully!");
-      reset();
-      setOpen(false);
-      onSuccess?.(createdJob);
+      toast.success("Job updated successfully!");
+      onOpenChange(false);
+      onSuccess();
     } catch (error) {
-      toast.error("Failed to add job. Please try again.");
+      toast.error("Failed to update job. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
-          <Plus className="mr-2 h-4 w-4" /> Add Job
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Job Application</DialogTitle>
-          <DialogDescription>Track a new job application.</DialogDescription>
+          <DialogTitle>Edit Job Application</DialogTitle>
+          <DialogDescription>
+            Update the details of your job application.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -148,17 +143,26 @@ const CreateJobApplicationDialogue = ({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Input
+              id="notes"
+              {...register("notes")}
+              placeholder="Additional notes..."
+            />
+          </div>
+
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
               disabled={loading}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Job"}
+              {loading ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>
@@ -167,4 +171,5 @@ const CreateJobApplicationDialogue = ({
   );
 };
 
-export default CreateJobApplicationDialogue;
+export default EditJobDialog;
+export { EditJobDialog };

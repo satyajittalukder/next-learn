@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { Button } from '@/components/ui/button';
 
 export interface IColumn extends Document {
   name: string;
